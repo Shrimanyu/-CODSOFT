@@ -1,0 +1,89 @@
+import json
+
+def load_tasks():
+    try:
+        with open('tasks.json', 'r') as file:
+            tasks = json.load(file)
+    except FileNotFoundError:
+        tasks = []
+    return tasks
+
+def save_tasks(tasks):
+    with open('tasks.json', 'w') as file:
+        json.dump(tasks, file, indent=4)
+
+def create_task(name, description, due_date):
+    tasks = load_tasks()
+    task = {
+        'name': name,
+        'description': description,
+        'due_date': due_date,
+        'completed': False
+    }
+    tasks.append(task)
+    save_tasks(tasks)
+    print(f'Task "{name}" created successfully!')
+
+def list_tasks():
+    tasks = load_tasks()
+    if not tasks:
+        print("No tasks found.")
+    else:
+        print("Tasks:")
+        for idx, task in enumerate(tasks, start=1):
+            status = "Completed" if task['completed'] else "Pending"
+            print(f"{idx}. Name: {task['name']} | Description: {task['description']} | Due Date: {task['due_date']} | Status: {status}")
+
+def update_task_status(task_idx, completed):
+    tasks = load_tasks()
+    if 0 <= task_idx < len(tasks):
+        tasks[task_idx]['completed'] = completed
+        save_tasks(tasks)
+        print("Task status updated successfully!")
+    else:
+        print("Invalid task index.")
+
+def delete_task(task_idx):
+    tasks = load_tasks()
+    if 0 <= task_idx < len(tasks):
+        deleted_task = tasks.pop(task_idx)
+        save_tasks(tasks)
+        print(f'Task "{deleted_task["name"]}" deleted successfully!')
+    else:
+        print("Invalid task index.")
+
+def main():
+    while True:
+        print("\nTo-Do List Menu:")
+        print("1. Create Task")
+        print("2. List Tasks")
+        print("3. Update Task Status")
+        print("4. Delete Task")
+        print("5. Quit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            name = input("Enter task name: ")
+            description = input("Enter task description: ")
+            due_date = input("Enter due date: ")
+            create_task(name, description, due_date)
+        elif choice == '2':
+            list_tasks()
+        elif choice == '3':
+            list_tasks()
+            task_idx = int(input("Enter the task index to update status: "))
+            completed = input("Mark as completed? (y/n): ").strip().lower() == 'y'
+            update_task_status(task_idx - 1, completed)
+        elif choice == '4':
+            list_tasks()
+            task_idx = int(input("Enter the task index to delete: "))
+            delete_task(task_idx - 1)
+        elif choice == '5':
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
